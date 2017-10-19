@@ -30,7 +30,7 @@
 /// @param[in] tag struct tag name
 #define SLIST_LINK(tag)       \
   struct {                    \
-    struct tag* __slist_next; \
+    struct tag* _slist_next;  \
   }
 
 /// Definition of a new list type.
@@ -39,7 +39,7 @@
 /// @param[in] type list element type
 #define SLIST_TYPE(tag, type) \
   struct tag {                \
-    type* __slist_fst;        \
+    type* _slist_fst;         \
   }
 
 /// Obtain the first element of the list.
@@ -47,7 +47,7 @@
 ///
 /// @param[in] list list
 #define SLIST_FIRST(list) \
-  ((list)->__slist_fst)
+  ((list)->_slist_fst)
 
 /// Obtain the linked element.
 /// @return NULL if no element is linked, next element otherwise
@@ -55,7 +55,7 @@
 /// @param[in] elem element
 /// @param[in] link element link name
 #define SLIST_NEXT(elem, link) \
-  ((elem)->link.__slist_next)
+  ((elem)->link._slist_next)
 
 /// Initialise the list.
 ///
@@ -81,11 +81,11 @@
 /// @param[in] ...   variable-length arguments for the function
 #define SLIST_MAP(list, type, link, func, ...)           \
   do {                                                   \
-    type* __slist_elem;                                  \
-    for (__slist_elem = SLIST_FIRST(list);               \
-         __slist_elem != NULL;                           \
-         __slist_elem = SLIST_NEXT(__slist_elem, link))  \
-      func(__slist_elem, __VA_ARGS__);                   \
+    type* _slist_elem;                                   \
+    for (_slist_elem = SLIST_FIRST(list);                \
+         _slist_elem != NULL;                            \
+         _slist_elem = SLIST_NEXT(_slist_elem, link))    \
+      func(_slist_elem, __VA_ARGS__);                    \
   } while (0)
 
 /// Traverse the list and remove elements that fail for a predicate.
@@ -98,17 +98,17 @@
 /// @param[in] ...   variable-length arguments for the predicate
 #define SLIST_FILTER(list, type, link, clean, func, ...)  \
   do {                                                    \
-    type** __slist_curr;                                  \
-    type* __slist_elem;                                   \
-    __slist_curr = &(SLIST_FIRST(list));                  \
-    while (*__slist_curr != NULL) {                       \
-      __slist_elem = *__slist_curr;                       \
-      if (func(__slist_elem, __VA_ARGS__ )) {             \
-        *__slist_curr = SLIST_NEXT(__slist_elem, link);   \
+    type** _slist_curr;                                   \
+    type* _slist_elem;                                    \
+    _slist_curr = &(SLIST_FIRST(list));                   \
+    while (*_slist_curr != NULL) {                        \
+      _slist_elem = *_slist_curr;                         \
+      if (func(_slist_elem, __VA_ARGS__ )) {              \
+        *_slist_curr = SLIST_NEXT(_slist_elem, link);     \
         if (clean)                                        \
-          free(__slist_elem);                             \
+          free(_slist_elem);                              \
       } else {                                            \
-        __slist_curr = &(SLIST_NEXT(__slist_elem, link)); \
+        _slist_curr = &(SLIST_NEXT(_slist_elem, link));   \
       }                                                   \
     }                                                     \
   } while (0)
@@ -120,18 +120,18 @@
 /// @param[in] link element link name
 #define SLIST_REVERSE(list, type, link)              \
   do {                                               \
-    type* __slist_prev;                              \
-    type* __slist_curr;                              \
-    type* __slist_next;                              \
-    __slist_prev = NULL;                             \
-    __slist_curr = SLIST_FIRST(list);                \
-    while (__slist_curr != NULL) {                   \
-      __slist_next = SLIST_NEXT(__slist_curr, link); \
-      SLIST_NEXT(__slist_curr, link) = __slist_prev; \
-      __slist_prev = __slist_curr;                   \
-      __slist_curr = __slist_next;                   \
+    type* _slist_prev;                               \
+    type* _slist_curr;                               \
+    type* _slist_next;                               \
+    _slist_prev = NULL;                              \
+    _slist_curr = SLIST_FIRST(list);                 \
+    while (_slist_curr != NULL) {                    \
+      _slist_next = SLIST_NEXT(_slist_curr, link);   \
+      SLIST_NEXT(_slist_curr, link) = _slist_prev;   \
+      _slist_prev = _slist_curr;                     \
+      _slist_curr = _slist_next;                     \
     }                                                \
-    SLIST_FIRST(list) = __slist_prev;                \
+    SLIST_FIRST(list) = _slist_prev;                 \
   } while (0)
 
 /// Insert an element to the head of the list.
@@ -164,12 +164,12 @@
 /// @param[in] clean decision to deallocate memory
 #define SLIST_POP(list, type, link, clean)                \
   do {                                                    \
-    type* __slist_elem;                                   \
-    __slist_elem = SLIST_FIRST(list);                     \
-    if (__slist_elem != NULL) {                           \
-      SLIST_FIRST(list) = SLIST_NEXT(__slist_elem, link); \
+    type* _slist_elem;                                    \
+    _slist_elem = SLIST_FIRST(list);                      \
+    if (_slist_elem != NULL) {                            \
+      SLIST_FIRST(list) = SLIST_NEXT(_slist_elem, link);  \
       if (clean)                                          \
-        free(__slist_elem);                               \
+        free(_slist_elem);                                \
     }                                                     \
   } while (0)
 
@@ -181,13 +181,13 @@
 /// @param[in] clean decision to deallocate memory
 #define SLIST_REMOVE(elem, type, link, clean)                \
   do {                                                       \
-    type* __slist_elem;                                      \
-    __slist_elem = SLIST_NEXT(elem, link);                   \
-    if (__slist_elem == NULL)                                \
+    type* _slist_elem;                                       \
+    _slist_elem = SLIST_NEXT(elem, link);                    \
+    if (_slist_elem == NULL)                                 \
       break;                                                 \
-    SLIST_NEXT(elem, link) = SLIST_NEXT(__slist_elem, link); \
+    SLIST_NEXT(elem, link) = SLIST_NEXT(_slist_elem, link);  \
     if (clean)                                               \
-      free(__slist_elem);                                    \
+      free(_slist_elem);                                     \
   } while (0)
 
 /// Remove all elements from the list.
