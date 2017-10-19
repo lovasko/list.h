@@ -107,7 +107,7 @@
 /// @param[in] list  list
 /// @param[in] type  element C type name
 /// @param[in] link  element link name
-/// @param[in] clean resource deallocation decision
+/// @param[in] clean deallocation function
 /// @param[in] func  predicate
 /// @param[in] ...   variable-length arguments for the predicate
 #define SLIST_FILTER(list, type, link, clean, func, ...) \
@@ -119,8 +119,8 @@
       _slist_elem = *_slist_curr;                        \
       if (func(_slist_elem, __VA_ARGS__)) {              \
         *_slist_curr = SLIST_NEXT(_slist_elem, link);    \
-        if (clean)                                       \
-          free(_slist_elem);                             \
+        if (clean != NULL)                               \
+          clean(_slist_elem);                            \
       } else {                                           \
         _slist_curr = &(SLIST_NEXT(_slist_elem, link));  \
       }                                                  \
@@ -175,15 +175,15 @@
 /// @param[in] list  list
 /// @param[in] type  element C type name
 /// @param[in] link  element link name
-/// @param[in] clean decision to deallocate memory
+/// @param[in] clean deallocation function
 #define SLIST_POP(list, type, link, clean)               \
   do {                                                   \
     type* _slist_elem;                                   \
     _slist_elem = SLIST_FIRST(list);                     \
     if (_slist_elem != NULL) {                           \
       SLIST_FIRST(list) = SLIST_NEXT(_slist_elem, link); \
-      if (clean)                                         \
-        free(_slist_elem);                               \
+      if (clean != NULL)                                 \
+        clean(_slist_elem);                              \
     }                                                    \
   } while (0)
 
@@ -192,7 +192,7 @@
 /// @param[in] elem  element
 /// @param[in] type  element C type name
 /// @param[in] link  element link name
-/// @param[in] clean decision to deallocate memory
+/// @param[in] clean deallocation function
 #define SLIST_REMOVE(elem, type, link, clean)               \
   do {                                                      \
     type* _slist_elem;                                      \
@@ -200,8 +200,8 @@
     if (_slist_elem == NULL)                                \
       break;                                                \
     SLIST_NEXT(elem, link) = SLIST_NEXT(_slist_elem, link); \
-    if (clean)                                              \
-      free(_slist_elem);                                    \
+    if (clean != NULL)                                      \
+      clean(_slist_elem);                                   \
   } while (0)
 
 /// Remove all elements from the list.
@@ -209,7 +209,7 @@
 /// @param[in] list  list
 /// @param[in] type  element C type name
 /// @param[in] link  element link name
-/// @param[in] clean decision to deallocate memory
+/// @param[in] clean deallocation function
 #define SLIST_FREE(list, type, link, clean) \
   do {                                      \
     while (!SLIST_EMPTY(list))              \
