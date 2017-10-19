@@ -23,6 +23,20 @@
 // SLIST_POP     // O(1)            //
 // SLIST_REMOVE  // O(1)            //
 // SLIST_FREE    // O(n)            //
+// SLIST_SORT    // O(n * log n)    //
+// SLIST_UNIQUE  // O(n)            //
+// SLIST_COPY    // O(1)            //
+// SLIST_DETACH  // O(1)            //
+// SLIST_ATTACH  // O(1)            //
+// SLIST_DROP    // O(n)            //
+// SLIST_TAKE    // O(n)            //
+// SLIST_LAST    // O(n)            //
+// SLIST_ALL     // O(n)            //
+// SLIST_ANY     // O(n)            //
+// SLIST_MAX     // O(n)            //
+// SLIST_MIN     // O(n)            //
+// SLIST_LENGTH  // O(n)            //
+// SLIST_ZIP     // O(n)            //
 //////////////////////////////////////
 
 /// Definition of a new element link.
