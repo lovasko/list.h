@@ -117,7 +117,7 @@
     _slist_curr = &(SLIST_FIRST(list));                  \
     while (*_slist_curr != NULL) {                       \
       _slist_elem = *_slist_curr;                        \
-      if (func(_slist_elem, __VA_ARGS__ )) {             \
+      if (func(_slist_elem, __VA_ARGS__)) {              \
         *_slist_curr = SLIST_NEXT(_slist_elem, link);    \
         if (clean)                                       \
           free(_slist_elem);                             \
