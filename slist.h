@@ -112,9 +112,8 @@
 /// @param[in] ...   variable-length arguments for the predicate
 #define SLIST_FILTER(list, type, link, clean, func, ...) \
   do {                                                   \
-    type** _slist_curr;                                  \
-    type* _slist_elem;                                   \
-    _slist_curr = &(SLIST_FIRST(list));                  \
+    type** _slist_curr = &(SLIST_FIRST(list));           \
+    type* _slist_elem = NULL;                            \
     while (*_slist_curr != NULL) {                       \
       _slist_elem = *_slist_curr;                        \
       if (func(_slist_elem, __VA_ARGS__)) {              \
@@ -134,11 +133,9 @@
 /// @param[in] link element link name
 #define SLIST_REVERSE(list, type, link)            \
   do {                                             \
-    type* _slist_prev;                             \
-    type* _slist_curr;                             \
-    type* _slist_next;                             \
-    _slist_prev = NULL;                            \
-    _slist_curr = SLIST_FIRST(list);               \
+    type* _slist_prev = NULL;                      \
+    type* _slist_curr = SLIST_FIRST(list);         \
+    type* _slist_next = NULL;                      \
     while (_slist_curr != NULL) {                  \
       _slist_next = SLIST_NEXT(_slist_curr, link); \
       SLIST_NEXT(_slist_curr, link) = _slist_prev; \
@@ -178,8 +175,7 @@
 /// @param[in] clean deallocation function
 #define SLIST_POP(list, type, link, clean)               \
   do {                                                   \
-    type* _slist_elem;                                   \
-    _slist_elem = SLIST_FIRST(list);                     \
+    type* _slist_elem = SLIST_FIRST(list);               \
     if (_slist_elem != NULL) {                           \
       SLIST_FIRST(list) = SLIST_NEXT(_slist_elem, link); \
       if (clean != NULL)                                 \
@@ -195,8 +191,7 @@
 /// @param[in] clean deallocation function
 #define SLIST_REMOVE(elem, type, link, clean)               \
   do {                                                      \
-    type* _slist_elem;                                      \
-    _slist_elem = SLIST_NEXT(elem, link);                   \
+    type* _slist_elem = SLIST_NEXT(elem, link);             \
     if (_slist_elem == NULL)                                \
       break;                                                \
     SLIST_NEXT(elem, link) = SLIST_NEXT(_slist_elem, link); \
