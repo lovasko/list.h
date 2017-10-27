@@ -83,8 +83,10 @@
 /// @return decision
 ///
 /// @param[in] list list
-#define SLIST_EMPTY(list) \
-  (SLIST_FIRST(list) == NULL)
+#define SLIST_EMPTY(list, out)            \
+  do {                                    \
+    *(out) = (SLIST_FIRST(list) == NULL); \
+  } while (0)
 
 /// Traverse the list and execute a function for each element.
 ///
@@ -207,7 +209,7 @@
 /// @param[in] clean deallocation function
 #define SLIST_FREE(list, type, link, clean) \
   do {                                      \
-    while (!SLIST_EMPTY(list))              \
+    while (SLIST_FIRST(list) != NULL)       \
       SLIST_POP(list, type, link, clean);   \
   } while (0)
 
