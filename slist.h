@@ -148,6 +148,28 @@
     SLIST_FIRST(list) = _slist_prev;               \
   } while (0)
 
+/// Find the first matching element of the list.
+///
+/// @param[out] out  matching element or NULL
+/// @param[in]  list list
+/// @param[in]  type element C type name
+/// @param[in]  link element link name
+/// @param[in]  func matching function
+/// @param[in]  ...  variable-length arguments for the matching function
+#define SLIST_FIND(out, list, type, link, func, ...)    \
+  do {                                                  \
+    type* _slist_elem;                                  \
+    *(out) = NULL;                                      \
+    for (_slist_elem = SLIST_FIRST(list);               \
+         _slist_elem != NULL;                           \
+         _slist_elem = SLIST_NEXT(_slist_elem, link)) { \
+      if (func(_slist_elem, __VA_ARGS__)) {             \
+        *(out) = _slist_elem;                           \
+        break;                                          \
+      }                                                 \
+    }                                                   \
+  } while(0)
+
 /// Insert an element to the head of the list.
 ///
 /// @param[in] list list
