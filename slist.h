@@ -26,8 +26,8 @@
 // SLIST_SORT    // O(n * log n)    //
 // SLIST_UNIQUE  // O(n)            //
 // SLIST_COPY    // O(1)            //
-// SLIST_DETACH  // O(1)            //
 // SLIST_ATTACH  // O(1)            //
+// SLIST_DETACH  // O(1)            //
 // SLIST_DROP    // O(n)            //
 // SLIST_TAKE    // O(n)            //
 // SLIST_LAST    // O(n)            //
@@ -234,6 +234,23 @@
   do {                                      \
     while (SLIST_FIRST(list) != NULL)       \
       SLIST_POP(list, type, link, clean);   \
+  } while (0)
+
+/// Attach a new chain of elements to the list instead of the current one.
+///
+/// @param[in] list list
+/// @param[in] elem first element of the chain
+#define SLIST_ATTACH(list, elem) \
+  do {                           \
+    SLIST_FIRST(list) = (elem);  \
+  } while (0)
+
+/// Detach all elements from the list without releasing any resources.
+///
+/// @param[in] list
+#define SLIST_DETACH(list)    \
+  do {                        \
+    SLIST_FIRST(list) = NULL; \
   } while (0)
 
 /// Compute the length of the list.
