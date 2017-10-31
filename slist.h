@@ -236,4 +236,20 @@
       SLIST_POP(list, type, link, clean);   \
   } while (0)
 
+/// Compute the length of the list.
+///
+/// @param[out] out  length of the list (zero if empty)
+/// @param[in]  list list
+/// @param[in]  type element C type name
+/// @param[in]  link element link name
+#define SLIST_LENGTH(out, list, type, link)           \
+  do {                                                \
+    type* _slist_elem;                                \
+    *(out) = 0;                                       \
+    for (_slist_elem = SLIST_FIRST(list);             \
+         _slist_elem != NULL;                         \
+         _slist_elem = SLIST_NEXT(_slist_elem, link)) \
+      *(out) += 1;                                    \
+  } while (0)
+
 #endif
