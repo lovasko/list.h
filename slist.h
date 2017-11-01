@@ -2,6 +2,7 @@
 #define SLIST_H
 
 #include <stdlib.h>
+#include <stdint.h>
 
 
 //////////////////////////////////////
@@ -251,6 +252,43 @@
 #define SLIST_DETACH(list)    \
   do {                        \
     SLIST_FIRST(list) = NULL; \
+  } while (0)
+
+/// Drop the first N elements from the list.
+///
+/// @param[in] list  list
+/// @param[in] type  element C type name
+/// @param[in] link  element link name
+/// @param[in] n     number of elements to drop
+/// @param[in] clean deallocation function
+#define SLIST_DROP(list, type, link, n, clean) \
+  do {                                         \
+    for (intmax_t _slist_i = 0;                \
+         _slist_i < (intmax_t)(n);             \
+         _slist_i++) {                         \
+      SLIST_POP(list, type, link, clean);      \
+      if (SLIST_FIRST(list) == NULL)           \
+        break;                                 \
+    }                                          \
+  } while (0)
+
+/// Take the first N elements from the list and dispose of the rest.
+///
+/// @param[in] list  list
+/// @param[in] type  element C type name
+/// @param[in] link  element link name
+/// @param[in] n     number of elements to take
+/// @param[in] clean deallocation function
+#define SLIST_TAKE(list, type, link, n, clean)                 \
+  do {                                                         \
+    intmax_t _slist_i = 1;                                     \
+    type* _slist_elem2 = SLIST_FIRST(list);                    \
+    while (_slist_elem2 != NULL && _slist_i < (intmax_t)(n)) { \
+      _slist_elem2 = SLIST_NEXT(_slist_elem2, link);           \
+      _slist_i++;                                              \
+    }                                                          \
+    while (SLIST_NEXT(_slist_elem2, link) != NULL)             \
+      SLIST_REMOVE(_slist_elem2, type, link, clean);           \
   } while (0)
 
 /// Compute the length of the list.
