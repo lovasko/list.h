@@ -11,6 +11,7 @@
 // SLIST_LINK    // compile time    //
 // SLIST_TYPE    // compile time    //
 // SLIST_FIRST   // O(1)            //
+// SLIST_LAST    // O(n)            //
 // SLIST_NEXT    // O(1)            //
 // SLIST_NEW     // O(1)            //
 // SLIST_EMPTY   // O(1)            //
@@ -31,7 +32,6 @@
 // SLIST_DETACH  // O(1)            //
 // SLIST_DROP    // O(n)            //
 // SLIST_TAKE    // O(n)            //
-// SLIST_LAST    // O(n)            //
 // SLIST_ALL     // O(n)            //
 // SLIST_ANY     // O(n)            //
 // SLIST_MAX     // O(n)            //
@@ -63,6 +63,24 @@
 /// @param[in] list list
 #define SLIST_FIRST(list) \
   ((list)->_slist_fst)
+
+/// Obtain the last element of the list.
+///
+/// @param[out] out  last element (NULL if the list is empty)
+/// @param[in]  list list
+/// @param[in]  type element C type name
+/// @param[in]  link element link name
+#define SLIST_LAST(out, list, type, link)          \
+  do {                                             \
+    type* _slist_elem = SLIST_FIRST(list);         \
+    if (_slist_elem == NULL) {                     \
+      *(out) = NULL;                               \
+      break;                                       \
+    }                                              \
+    while (SLIST_NEXT(_slist_elem, link) != NULL)  \
+      _slist_elem = SLIST_NEXT(_slist_elem, link); \
+    *(out) = _slist_elem;                          \
+  } while (0)
 
 /// Obtain the linked element.
 /// @return NULL if no element is linked, next element otherwise
