@@ -354,6 +354,52 @@
     }                                                   \
   } while (0)
 
+/// Find the maximal list element.
+///
+/// @param[out] out  maximal element
+/// @param[in]  list list
+/// @param[in]  type element C type name
+/// @param[in]  link element link name
+/// @param[in]  func comparison function
+/// @param[in]  ...  variable-length arguments for the function
+#define SLIST_MAX(out, list, type, link, func, ...)   \
+  do {                                                \
+    type* _slist_elem;                                \
+    _slist_elem = *(out) = SLIST_FIRST(list);         \
+    if (*(out) == NULL)                               \
+      break;                                          \
+    while (true) {                                    \
+      if (func(*(out), _slist_elem, __VA_ARGS__) < 1) \
+        *(out) = _slist_elem;                         \
+      _slist_elem = SLIST_NEXT(_slist_elem, link);    \
+      if (_slist_elem == NULL)                        \
+        break;                                        \
+    }                                                 \
+  } while (0)
+
+/// Find the minimal list element.
+///
+/// @param[out] out  maximal element
+/// @param[in]  list list
+/// @param[in]  type element C type name
+/// @param[in]  link element link name
+/// @param[in]  func comparison function
+/// @param[in]  ...  variable-length arguments for the function
+#define SLIST_MIN(out, list, type, link, func, ...)    \
+  do {                                                 \
+    type* _slist_elem;                                 \
+    _slist_elem = *(out) = SLIST_FIRST(list);          \
+    if (*(out) == NULL)                                \
+      break;                                           \
+    while (true) {                                     \
+      if (func(*(out), _slist_elem, __VA_ARGS__) > -1) \
+        *(out) = _slist_elem;                          \
+      _slist_elem = SLIST_NEXT(_slist_elem, link);     \
+      if (_slist_elem == NULL)                         \
+        break;                                         \
+    }                                                  \
+  } while (0)
+
 /// Compute the length of the list.
 ///
 /// @param[out] out  length of the list (zero if empty)
