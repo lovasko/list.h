@@ -12,6 +12,7 @@
 // SLIST_TYPE    // compile time    //
 // SLIST_FIRST   // O(1)            //
 // SLIST_LAST    // O(n)            //
+// SLIST_NTH     // O(n)            //
 // SLIST_NEXT    // O(1)            //
 // SLIST_NEW     // O(1)            //
 // SLIST_EMPTY   // O(1)            //
