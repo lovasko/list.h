@@ -309,6 +309,50 @@
       SLIST_REMOVE(_slist_elem2, type, link, clean);           \
   } while (0)
 
+/// Verify that all list elements satisfy a given predicate.
+///
+/// @param[out] out  decision
+/// @param[in]  list list
+/// @param[in]  type element C type name
+/// @param[in]  link element link name
+/// @param[in]  func function predicate
+/// @param[in]  ...  variable-length arguments for the function
+#define SLIST_ALL(out, list, type, link, func, ...)     \
+  do {                                                  \
+    type* _slist_elem;                                  \
+    *(out) = true;                                      \
+    for (_slist_elem = SLIST_FIRST(list);               \
+         _slist_elem != NULL;                           \
+         _slist_elem = SLIST_NEXT(_slist_elem, link)) { \
+      if (!func(_slist_elem, __VA_ARGS__)) {            \
+        *(out) = false;                                 \
+        break;                                          \
+      }                                                 \
+    }                                                   \
+  } while (0)
+
+/// Verify that at least one list element satisfies a given predicate.
+///
+/// @param[out] out  decision
+/// @param[in]  list list
+/// @param[in]  type element C type name
+/// @param[in]  link element link name
+/// @param[in]  func function predicate
+/// @param[in]  ...  variable-length arguments for the function
+#define SLIST_ANY(out, list, type, link, func, ...)     \
+  do {                                                  \
+    type* _slist_elem;                                  \
+    *(out) = false;                                     \
+    for (_slist_elem = SLIST_FIRST(list);               \
+         _slist_elem != NULL;                           \
+         _slist_elem = SLIST_NEXT(_slist_elem, link)) { \
+      if (func(_slist_elem, __VA_ARGS__)) {             \
+        *(out) = true;                                  \
+        break;                                          \
+      }                                                 \
+    }                                                   \
+  } while (0)
+
 /// Compute the length of the list.
 ///
 /// @param[out] out  length of the list (zero if empty)
