@@ -102,9 +102,9 @@
 /// Determine whether the list is empty.
 /// @return decision
 ///
-/// @param[in]  list list
 /// @param[out] out  decision
-#define SLIST_EMPTY(list, out)            \
+/// @param[in]  list list
+#define SLIST_EMPTY(out, list)            \
   do {                                    \
     *(out) = (SLIST_FIRST(list) == NULL); \
   } while (0)
