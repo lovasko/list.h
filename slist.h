@@ -72,16 +72,16 @@
 /// @param[in]  list list
 /// @param[in]  type element C type name
 /// @param[in]  link element link name
-#define SLIST_LAST(out, list, type, link)          \
-  do {                                             \
-    type* _slist_elem = SLIST_FIRST(list);         \
-    if (_slist_elem == NULL) {                     \
-      *(out) = NULL;                               \
-      break;                                       \
-    }                                              \
-    while (SLIST_NEXT(_slist_elem, link) != NULL)  \
-      _slist_elem = SLIST_NEXT(_slist_elem, link); \
-    *(out) = _slist_elem;                          \
+#define SLIST_LAST(out, list, type, link)      \
+  do {                                         \
+    type* _slist_e = SLIST_FIRST(list);        \
+    if (_slist_e == NULL) {                    \
+      *(out) = NULL;                           \
+      break;                                   \
+    }                                          \
+    while (SLIST_NEXT(_slist_e, link) != NULL) \
+      _slist_e = SLIST_NEXT(_slist_e, link);   \
+    *(out) = _slist_e;                         \
   } while (0)
 
 /// Obtain the n-th element of the list.
@@ -137,13 +137,12 @@
 /// @param[in] link element link name
 /// @param[in] func function
 /// @param[in] ...   variable-length arguments for the function
-#define SLIST_MAP(list, type, link, func, ...)        \
-  do {                                                \
-    type* _slist_elem;                                \
-    for (_slist_elem = SLIST_FIRST(list);             \
-         _slist_elem != NULL;                         \
-         _slist_elem = SLIST_NEXT(_slist_elem, link)) \
-      func(_slist_elem, __VA_ARGS__);                 \
+#define SLIST_MAP(list, type, link, func, ...)  \
+  do {                                          \
+    for (type* _slist_e = SLIST_FIRST(list);    \
+         _slist_e != NULL;                      \
+         _slist_e = SLIST_NEXT(_slist_e, link)) \
+      func(_slist_e, __VA_ARGS__);              \
   } while (0)
 
 /// Traverse the list and remove elements that fail for a predicate.
@@ -156,16 +155,16 @@
 /// @param[in] ...   variable-length arguments for the predicate
 #define SLIST_FILTER(list, type, link, clean, func, ...) \
   do {                                                   \
-    type** _slist_curr = &(SLIST_FIRST(list));           \
-    type* _slist_elem = NULL;                            \
-    while (*_slist_curr != NULL) {                       \
-      _slist_elem = *_slist_curr;                        \
-      if (func(_slist_elem, __VA_ARGS__)) {              \
-        *_slist_curr = SLIST_NEXT(_slist_elem, link);    \
+    type** _slist_c = &(SLIST_FIRST(list));              \
+    type* _slist_e = NULL;                               \
+    while (*_slist_c != NULL) {                          \
+      _slist_e = *_slist_c;                              \
+      if (func(_slist_e, __VA_ARGS__)) {                 \
+        *_slist_c = SLIST_NEXT(_slist_e, link);          \
         if (clean != NULL)                               \
-          clean(_slist_elem);                            \
+          clean(_slist_e);                               \
       } else {                                           \
-        _slist_curr = &(SLIST_NEXT(_slist_elem, link));  \
+        _slist_c = &(SLIST_NEXT(_slist_e, link));        \
       }                                                  \
     }                                                    \
   } while (0)
@@ -175,18 +174,18 @@
 /// @param[in] list list
 /// @param[in] type element C type name
 /// @param[in] link element link name
-#define SLIST_REVERSE(list, type, link)            \
-  do {                                             \
-    type* _slist_prev = NULL;                      \
-    type* _slist_curr = SLIST_FIRST(list);         \
-    type* _slist_next = NULL;                      \
-    while (_slist_curr != NULL) {                  \
-      _slist_next = SLIST_NEXT(_slist_curr, link); \
-      SLIST_NEXT(_slist_curr, link) = _slist_prev; \
-      _slist_prev = _slist_curr;                   \
-      _slist_curr = _slist_next;                   \
-    }                                              \
-    SLIST_FIRST(list) = _slist_prev;               \
+#define SLIST_REVERSE(list, type, link)      \
+  do {                                       \
+    type* _slist_p = NULL;                   \
+    type* _slist_c = SLIST_FIRST(list);      \
+    type* _slist_n = NULL;                   \
+    while (_slist_c != NULL) {               \
+      _slist_n = SLIST_NEXT(_slist_c, link); \
+      SLIST_NEXT(_slist_c, link) = _slist_p; \
+      _slist_p = _slist_c;                   \
+      _slist_c = _slist_n;                   \
+    }                                        \
+    SLIST_FIRST(list) = _slist_p;            \
   } while (0)
 
 /// Find the first matching element of the list.
@@ -197,18 +196,17 @@
 /// @param[in]  link element link name
 /// @param[in]  func matching function
 /// @param[in]  ...  variable-length arguments for the matching function
-#define SLIST_FIND(out, list, type, link, func, ...)    \
-  do {                                                  \
-    type* _slist_elem;                                  \
-    *(out) = NULL;                                      \
-    for (_slist_elem = SLIST_FIRST(list);               \
-         _slist_elem != NULL;                           \
-         _slist_elem = SLIST_NEXT(_slist_elem, link)) { \
-      if (func(_slist_elem, __VA_ARGS__)) {             \
-        *(out) = _slist_elem;                           \
-        break;                                          \
-      }                                                 \
-    }                                                   \
+#define SLIST_FIND(out, list, type, link, func, ...) \
+  do {                                               \
+    *(out) = NULL;                                   \
+    for (type* _slist_e = SLIST_FIRST(list);         \
+         _slist_e != NULL;                           \
+         _slist_e = SLIST_NEXT(_slist_e, link)) {    \
+      if (func(_slist_e, __VA_ARGS__)) {             \
+        *(out) = _slist_e;                           \
+        break;                                       \
+      }                                              \
+    }                                                \
   } while(0)
 
 /// Insert an element to the head of the list.
@@ -239,14 +237,14 @@
 /// @param[in] type  element C type name
 /// @param[in] link  element link name
 /// @param[in] clean deallocation function
-#define SLIST_POP(list, type, link, clean)               \
-  do {                                                   \
-    type* _slist_elem = SLIST_FIRST(list);               \
-    if (_slist_elem != NULL) {                           \
-      SLIST_FIRST(list) = SLIST_NEXT(_slist_elem, link); \
-      if (clean != NULL)                                 \
-        clean(_slist_elem);                              \
-    }                                                    \
+#define SLIST_POP(list, type, link, clean)            \
+  do {                                                \
+    type* _slist_e = SLIST_FIRST(list);               \
+    if (_slist_e != NULL) {                           \
+      SLIST_FIRST(list) = SLIST_NEXT(_slist_e, link); \
+      if (clean != NULL)                              \
+        clean(_slist_e);                              \
+    }                                                 \
   } while (0)
 
 /// Remove an element that is linked to the specified element.
@@ -255,14 +253,14 @@
 /// @param[in] type  element C type name
 /// @param[in] link  element link name
 /// @param[in] clean deallocation function
-#define SLIST_REMOVE(elem, type, link, clean)               \
-  do {                                                      \
-    type* _slist_elem = SLIST_NEXT(elem, link);             \
-    if (_slist_elem == NULL)                                \
-      break;                                                \
-    SLIST_NEXT(elem, link) = SLIST_NEXT(_slist_elem, link); \
-    if (clean != NULL)                                      \
-      clean(_slist_elem);                                   \
+#define SLIST_REMOVE(elem, type, link, clean)            \
+  do {                                                   \
+    type* _slist_e = SLIST_NEXT(elem, link);             \
+    if (_slist_e == NULL)                                \
+      break;                                             \
+    SLIST_NEXT(elem, link) = SLIST_NEXT(_slist_e, link); \
+    if (clean != NULL)                                   \
+      clean(_slist_e);                                   \
   } while (0)
 
 /// Remove all elements from the list.
@@ -319,16 +317,16 @@
 /// @param[in] link  element link name
 /// @param[in] n     number of elements to take
 /// @param[in] clean deallocation function
-#define SLIST_TAKE(list, type, link, n, clean)                 \
-  do {                                                         \
-    intmax_t _slist_i = 1;                                     \
-    type* _slist_elem2 = SLIST_FIRST(list);                    \
-    while (_slist_elem2 != NULL && _slist_i < (intmax_t)(n)) { \
-      _slist_elem2 = SLIST_NEXT(_slist_elem2, link);           \
-      _slist_i++;                                              \
-    }                                                          \
-    while (SLIST_NEXT(_slist_elem2, link) != NULL)             \
-      SLIST_REMOVE(_slist_elem2, type, link, clean);           \
+#define SLIST_TAKE(list, type, link, n, clean)              \
+  do {                                                      \
+    intmax_t _slist_i = 1;                                  \
+    type* _slist_f = SLIST_FIRST(list);                    \
+    while (_slist_f != NULL && _slist_i < (intmax_t)(n)) { \
+      _slist_f = SLIST_NEXT(_slist_f, link);              \
+      _slist_i++;                                           \
+    }                                                       \
+    while (SLIST_NEXT(_slist_f, link) != NULL)             \
+      SLIST_REMOVE(_slist_f, type, link, clean);           \
   } while (0)
 
 /// Verify that all list elements satisfy a given predicate.
@@ -339,18 +337,17 @@
 /// @param[in]  link element link name
 /// @param[in]  func function predicate
 /// @param[in]  ...  variable-length arguments for the function
-#define SLIST_ALL(out, list, type, link, func, ...)     \
-  do {                                                  \
-    type* _slist_elem;                                  \
-    *(out) = true;                                      \
-    for (_slist_elem = SLIST_FIRST(list);               \
-         _slist_elem != NULL;                           \
-         _slist_elem = SLIST_NEXT(_slist_elem, link)) { \
-      if (!func(_slist_elem, __VA_ARGS__)) {            \
-        *(out) = false;                                 \
-        break;                                          \
-      }                                                 \
-    }                                                   \
+#define SLIST_ALL(out, list, type, link, func, ...) \
+  do {                                              \
+    *(out) = true;                                  \
+    for (type* _slist_e = SLIST_FIRST(list);        \
+         _slist_e != NULL;                          \
+         _slist_e = SLIST_NEXT(_slist_e, link)) {   \
+      if (!func(_slist_e, __VA_ARGS__)) {           \
+        *(out) = false;                             \
+        break;                                      \
+      }                                             \
+    }                                               \
   } while (0)
 
 /// Verify that at least one list element satisfies a given predicate.
@@ -361,18 +358,17 @@
 /// @param[in]  link element link name
 /// @param[in]  func function predicate
 /// @param[in]  ...  variable-length arguments for the function
-#define SLIST_ANY(out, list, type, link, func, ...)     \
-  do {                                                  \
-    type* _slist_elem;                                  \
-    *(out) = false;                                     \
-    for (_slist_elem = SLIST_FIRST(list);               \
-         _slist_elem != NULL;                           \
-         _slist_elem = SLIST_NEXT(_slist_elem, link)) { \
-      if (func(_slist_elem, __VA_ARGS__)) {             \
-        *(out) = true;                                  \
-        break;                                          \
-      }                                                 \
-    }                                                   \
+#define SLIST_ANY(out, list, type, link, func, ...) \
+  do {                                              \
+    *(out) = false;                                 \
+    for (type* _slist_e = SLIST_FIRST(list);        \
+         _slist_e != NULL;                          \
+         _slist_e = SLIST_NEXT(_slist_e, link)) {   \
+      if (func(_slist_e, __VA_ARGS__)) {            \
+        *(out) = true;                              \
+        break;                                      \
+      }                                             \
+    }                                               \
   } while (0)
 
 /// Find the maximal list element.
@@ -383,19 +379,19 @@
 /// @param[in]  link element link name
 /// @param[in]  func comparison function
 /// @param[in]  ...  variable-length arguments for the function
-#define SLIST_MAX(out, list, type, link, func, ...)   \
-  do {                                                \
-    type* _slist_elem;                                \
-    _slist_elem = *(out) = SLIST_FIRST(list);         \
-    if (*(out) == NULL)                               \
-      break;                                          \
-    while (true) {                                    \
-      if (func(*(out), _slist_elem, __VA_ARGS__) < 1) \
-        *(out) = _slist_elem;                         \
-      _slist_elem = SLIST_NEXT(_slist_elem, link);    \
-      if (_slist_elem == NULL)                        \
-        break;                                        \
-    }                                                 \
+#define SLIST_MAX(out, list, type, link, func, ...) \
+  do {                                              \
+    type* _slist_e;                                 \
+    _slist_e = *(out) = SLIST_FIRST(list);          \
+    if (*(out) == NULL)                             \
+      break;                                        \
+    while (true) {                                  \
+      if (func(*(out), _slist_e, __VA_ARGS__) < 1)  \
+        *(out) = _slist_e;                          \
+      _slist_e = SLIST_NEXT(_slist_e, link);        \
+      if (_slist_e == NULL)                         \
+        break;                                      \
+    }                                               \
   } while (0)
 
 /// Find the minimal list element.
@@ -406,19 +402,19 @@
 /// @param[in]  link element link name
 /// @param[in]  func comparison function
 /// @param[in]  ...  variable-length arguments for the function
-#define SLIST_MIN(out, list, type, link, func, ...)    \
-  do {                                                 \
-    type* _slist_elem;                                 \
-    _slist_elem = *(out) = SLIST_FIRST(list);          \
-    if (*(out) == NULL)                                \
-      break;                                           \
-    while (true) {                                     \
-      if (func(*(out), _slist_elem, __VA_ARGS__) > -1) \
-        *(out) = _slist_elem;                          \
-      _slist_elem = SLIST_NEXT(_slist_elem, link);     \
-      if (_slist_elem == NULL)                         \
-        break;                                         \
-    }                                                  \
+#define SLIST_MIN(out, list, type, link, func, ...) \
+  do {                                              \
+    type* _slist_e;                                 \
+    _slist_e = *(out) = SLIST_FIRST(list);          \
+    if (*(out) == NULL)                             \
+      break;                                        \
+    while (true) {                                  \
+      if (func(*(out), _slist_e, __VA_ARGS__) > -1) \
+        *(out) = _slist_e;                          \
+      _slist_e = SLIST_NEXT(_slist_e, link);        \
+      if (_slist_e == NULL)                         \
+        break;                                      \
+    }                                               \
   } while (0)
 
 /// Compute the length of the list.
@@ -427,14 +423,13 @@
 /// @param[in]  list list
 /// @param[in]  type element C type name
 /// @param[in]  link element link name
-#define SLIST_LENGTH(out, list, type, link)           \
-  do {                                                \
-    type* _slist_elem;                                \
-    *(out) = 0;                                       \
-    for (_slist_elem = SLIST_FIRST(list);             \
-         _slist_elem != NULL;                         \
-         _slist_elem = SLIST_NEXT(_slist_elem, link)) \
-      *(out) += 1;                                    \
+#define SLIST_LENGTH(out, list, type, link)     \
+  do {                                          \
+    *(out) = 0;                                 \
+    for (type* _slist_e = SLIST_FIRST(list);    \
+         _slist_e != NULL;                      \
+         _slist_e = SLIST_NEXT(_slist_e, link)) \
+      *(out) += 1;                              \
   } while (0)
 
 /// Check whether an element is a member of the list.
