@@ -103,15 +103,15 @@ main(int argc, char* argv[])
   // Compute the sum of all numbers in the list.
   sum = 0;
   SLIST_MAP(&l, elem, el_next, elem_sum, &sum);
-  printf("Sum of the numbers is %" PRIiMAX "\n", sum);
+  printf("Sum of the numbers is %" PRIiMAX ".\n", sum);
 
   // Find the minimal number in the list.
   SLIST_MIN(&min, &l, elem, el_next, elem_compare, &min);
-  printf("Minimum of the numbers is %" PRIiMAX "\n", min->el_num);
+  printf("Minimum of the numbers is %" PRIiMAX ".\n", min->el_num);
 
   // Find the maximal number in the list.
   SLIST_MAX(&max, &l, elem, el_next, elem_compare, &max);
-  printf("Maximum of the numbers is %" PRIiMAX "\n", max->el_num);
+  printf("Maximum of the numbers is %" PRIiMAX ".\n", max->el_num);
 
   // Determine whether all numbers in the list are even.
   SLIST_ALL(&all, &l, elem, el_next, elem_is_even, NULL);
