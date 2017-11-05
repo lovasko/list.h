@@ -53,10 +53,12 @@ elem_is_even(const elem* e, const void* p)
 /// Add the number stored in a element to the final sum.
 ///
 /// @param[in]  e element
+/// @param[in]  i element index (unused)
 /// @param[out] s sum
 static void
-elem_sum(const elem* restrict e, intmax_t* restrict s)
+elem_sum(const elem* restrict e, intmax_t i, intmax_t* restrict s)
 {
+  (void)i;
   *s += e->el_num;
 }
 
