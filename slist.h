@@ -59,12 +59,33 @@
     type* _slist_fst;         \
   }
 
-/// Obtain the first element of the list.
+/// Internal function to access the next linked element.
+/// Please note that this function is for internal use only and should not be
+/// used in your code.
+/// @return NULL if no element is linked, next element otherwise
+///
+/// @param[in] elem element
+/// @param[in] link element link name
+#define _SLIST_NXT(elem, link) \
+  ((elem)->link._slist_nxt)
+
+/// Internal function to access the first element of the list.
+/// Please note that this function is for internal use only and should not be
+/// used in your code.
 /// @return NULL if empty, first element otherwise
 ///
 /// @param[in] list list
-#define SLIST_FIRST(list) \
+#define _SLIST_FST(list) \
   ((list)->_slist_fst)
+
+/// Obtain the first element of the list.
+///
+/// @param[out] out  first element
+/// @param[in]  list list
+#define SLIST_FIRST(out, list) \
+  do {                         \
+    *(out) = _SLIST_FST(list); \
+  } while (0)
 
 /// Obtain the last element of the list.
 ///
@@ -74,13 +95,13 @@
 /// @param[in]  link element link name
 #define SLIST_LAST(out, list, type, link)      \
   do {                                         \
-    type* _slist_e = SLIST_FIRST(list);        \
+    type* _slist_e = _SLIST_FST(list);         \
     if (_slist_e == NULL) {                    \
       *(out) = NULL;                           \
       break;                                   \
     }                                          \
-    while (SLIST_NEXT(_slist_e, link) != NULL) \
-      _slist_e = SLIST_NEXT(_slist_e, link);   \
+    while (_SLIST_NXT(_slist_e, link) != NULL) \
+      _slist_e = _SLIST_NXT(_slist_e, link);   \
     *(out) = _slist_e;                         \
   } while (0)
 
@@ -93,31 +114,33 @@
 /// @param[in]  n    position of the element
 #define SLIST_NTH(out, list, type, link, n)                  \
   do {                                                       \
-    type* _slist_e = SLIST_FIRST(list);                      \
+    type* _slist_e = _SLIST_FST(list);                       \
     if (_slist_e == NULL) {                                  \
       *(out) = NULL;                                         \
       break;                                                 \
     }                                                        \
     for (intmax_t _slist_i = 0;                              \
          _slist_i < (n) && _slist_e != NULL;                 \
-         _slist_i++, _slist_e = SLIST_NEXT(_slist_e, link)); \
+         _slist_i++, _slist_e = _SLIST_NXT(_slist_e, link)); \
     *(out) = _slist_e;                                       \
   } while (0)
 
-/// Obtain the linked element.
-/// @return NULL if no element is linked, next element otherwise
+/// Obtain the next linked element.
 ///
-/// @param[in] elem element
-/// @param[in] link element link name
-#define SLIST_NEXT(elem, link) \
-  ((elem)->link._slist_nxt)
+/// @param[out] out  next element
+/// @param[in]  elem element
+/// @param[in]  link element link name
+#define SLIST_NEXT(out, elem, link)  \
+  do {                               \
+    *(out) = _SLIST_NXT(elem, link); \
+  } while (0)
 
 /// Initialise the list.
 ///
 /// @param[in] list list
-#define SLIST_NEW(list)       \
-  do {                        \
-    SLIST_FIRST(list) = NULL; \
+#define SLIST_NEW(list)      \
+  do {                       \
+    _SLIST_FST(list) = NULL; \
   } while (0)
 
 /// Determine whether the list is empty.
@@ -125,9 +148,9 @@
 ///
 /// @param[out] out  decision
 /// @param[in]  list list
-#define SLIST_EMPTY(out, list)            \
-  do {                                    \
-    *(out) = (SLIST_FIRST(list) == NULL); \
+#define SLIST_EMPTY(out, list)           \
+  do {                                   \
+    *(out) = (_SLIST_FST(list) == NULL); \
   } while (0)
 
 /// Traverse the list and execute a function for each element.
@@ -139,9 +162,9 @@
 /// @param[in] ...   variable-length arguments for the function
 #define SLIST_MAP(list, type, link, func, ...)  \
   do {                                          \
-    for (type* _slist_e = SLIST_FIRST(list);    \
+    for (type* _slist_e = _SLIST_FST(list);     \
          _slist_e != NULL;                      \
-         _slist_e = SLIST_NEXT(_slist_e, link)) \
+         _slist_e = _SLIST_NXT(_slist_e, link)) \
       func(_slist_e, __VA_ARGS__);              \
   } while (0)
 
@@ -155,16 +178,16 @@
 /// @param[in] ...   variable-length arguments for the predicate
 #define SLIST_FILTER(list, type, link, clean, func, ...) \
   do {                                                   \
-    type** _slist_c = &(SLIST_FIRST(list));              \
+    type** _slist_c = &(_SLIST_FST(list));               \
     type* _slist_e = NULL;                               \
     while (*_slist_c != NULL) {                          \
       _slist_e = *_slist_c;                              \
       if (func(_slist_e, __VA_ARGS__)) {                 \
-        *_slist_c = SLIST_NEXT(_slist_e, link);          \
+        *_slist_c = _SLIST_NXT(_slist_e, link);          \
         if (clean != NULL)                               \
           clean(_slist_e);                               \
       } else {                                           \
-        _slist_c = &(SLIST_NEXT(_slist_e, link));        \
+        _slist_c = &(_SLIST_NXT(_slist_e, link));        \
       }                                                  \
     }                                                    \
   } while (0)
@@ -177,15 +200,15 @@
 #define SLIST_REVERSE(list, type, link)      \
   do {                                       \
     type* _slist_p = NULL;                   \
-    type* _slist_c = SLIST_FIRST(list);      \
+    type* _slist_c = _SLIST_FST(list);       \
     type* _slist_n = NULL;                   \
     while (_slist_c != NULL) {               \
-      _slist_n = SLIST_NEXT(_slist_c, link); \
-      SLIST_NEXT(_slist_c, link) = _slist_p; \
+      _slist_n = _SLIST_NXT(_slist_c, link); \
+      _SLIST_NXT(_slist_c, link) = _slist_p; \
       _slist_p = _slist_c;                   \
       _slist_c = _slist_n;                   \
     }                                        \
-    SLIST_FIRST(list) = _slist_p;            \
+    _SLIST_FST(list) = _slist_p;             \
   } while (0)
 
 /// Find the first matching element of the list.
@@ -199,9 +222,9 @@
 #define SLIST_FIND(out, list, type, link, func, ...) \
   do {                                               \
     *(out) = NULL;                                   \
-    for (type* _slist_e = SLIST_FIRST(list);         \
+    for (type* _slist_e = _SLIST_FST(list);          \
          _slist_e != NULL;                           \
-         _slist_e = SLIST_NEXT(_slist_e, link)) {    \
+         _slist_e = _SLIST_NXT(_slist_e, link)) {    \
       if (func(_slist_e, __VA_ARGS__)) {             \
         *(out) = _slist_e;                           \
         break;                                       \
@@ -214,10 +237,10 @@
 /// @param[in] list list
 /// @param[in] elem element
 /// @param[in] link element link name
-#define SLIST_PUSH(list, elem, link)            \
-  do {                                          \
-    SLIST_NEXT(elem, link) = SLIST_FIRST(list); \
-    SLIST_FIRST(list) = (elem);                 \
+#define SLIST_PUSH(list, elem, link)           \
+  do {                                         \
+    _SLIST_NXT(elem, link) = _SLIST_FST(list); \
+    _SLIST_FST(list) = (elem);                 \
   } while (0)
 
 /// Insert an element after the specified element.
@@ -227,8 +250,8 @@
 /// @param[in] link  element link name
 #define SLIST_INSERT(elem, toadd, link)               \
   do {                                                \
-    SLIST_NEXT(toadd, link) = SLIST_NEXT(elem, link); \
-    SLIST_NEXT(elem, link) = (toadd);                 \
+    _SLIST_NXT(toadd, link) = _SLIST_NXT(elem, link); \
+    _SLIST_NXT(elem, link) = (toadd);                 \
   } while (0)
 
 /// Remove an element from the head of the list.
@@ -237,14 +260,14 @@
 /// @param[in] type  element C type name
 /// @param[in] link  element link name
 /// @param[in] clean deallocation function
-#define SLIST_POP(list, type, link, clean)            \
-  do {                                                \
-    type* _slist_e = SLIST_FIRST(list);               \
-    if (_slist_e != NULL) {                           \
-      SLIST_FIRST(list) = SLIST_NEXT(_slist_e, link); \
-      if (clean != NULL)                              \
-        clean(_slist_e);                              \
-    }                                                 \
+#define SLIST_POP(list, type, link, clean)           \
+  do {                                               \
+    type* _slist_e = _SLIST_FST(list);               \
+    if (_slist_e != NULL) {                          \
+      _SLIST_FST(list) = _SLIST_NXT(_slist_e, link); \
+      if (clean != NULL)                             \
+        clean(_slist_e);                             \
+    }                                                \
   } while (0)
 
 /// Remove an element that is linked to the specified element.
@@ -255,10 +278,10 @@
 /// @param[in] clean deallocation function
 #define SLIST_REMOVE(elem, type, link, clean)            \
   do {                                                   \
-    type* _slist_e = SLIST_NEXT(elem, link);             \
+    type* _slist_e = _SLIST_NXT(elem, link);             \
     if (_slist_e == NULL)                                \
       break;                                             \
-    SLIST_NEXT(elem, link) = SLIST_NEXT(_slist_e, link); \
+    _SLIST_NXT(elem, link) = _SLIST_NXT(_slist_e, link); \
     if (clean != NULL)                                   \
       clean(_slist_e);                                   \
   } while (0)
@@ -271,7 +294,7 @@
 /// @param[in] clean deallocation function
 #define SLIST_FREE(list, type, link, clean) \
   do {                                      \
-    while (SLIST_FIRST(list) != NULL)       \
+    while (_SLIST_FST(list) != NULL)        \
       SLIST_POP(list, type, link, clean);   \
   } while (0)
 
@@ -281,15 +304,15 @@
 /// @param[in] elem first element of the chain
 #define SLIST_ATTACH(list, elem) \
   do {                           \
-    SLIST_FIRST(list) = (elem);  \
+    _SLIST_FST(list) = (elem);  \
   } while (0)
 
 /// Detach all elements from the list without releasing any resources.
 ///
 /// @param[in] list
-#define SLIST_DETACH(list)    \
-  do {                        \
-    SLIST_FIRST(list) = NULL; \
+#define SLIST_DETACH(list)   \
+  do {                       \
+    _SLIST_FST(list) = NULL; \
   } while (0)
 
 /// Drop the first N elements from the list.
@@ -305,7 +328,7 @@
          _slist_i < (intmax_t)(n);             \
          _slist_i++) {                         \
       SLIST_POP(list, type, link, clean);      \
-      if (SLIST_FIRST(list) == NULL)           \
+      if (_SLIST_FST(list) == NULL)            \
         break;                                 \
     }                                          \
   } while (0)
@@ -317,15 +340,15 @@
 /// @param[in] link  element link name
 /// @param[in] n     number of elements to take
 /// @param[in] clean deallocation function
-#define SLIST_TAKE(list, type, link, n, clean)              \
-  do {                                                      \
-    intmax_t _slist_i = 1;                                  \
-    type* _slist_f = SLIST_FIRST(list);                    \
+#define SLIST_TAKE(list, type, link, n, clean)             \
+  do {                                                     \
+    intmax_t _slist_i = 1;                                 \
+    type* _slist_f = _SLIST_FST(list);                     \
     while (_slist_f != NULL && _slist_i < (intmax_t)(n)) { \
-      _slist_f = SLIST_NEXT(_slist_f, link);              \
-      _slist_i++;                                           \
-    }                                                       \
-    while (SLIST_NEXT(_slist_f, link) != NULL)             \
+      _slist_f = _SLIST_NXT(_slist_f, link);               \
+      _slist_i++;                                          \
+    }                                                      \
+    while (_SLIST_NXT(_slist_f, link) != NULL)             \
       SLIST_REMOVE(_slist_f, type, link, clean);           \
   } while (0)
 
@@ -340,9 +363,9 @@
 #define SLIST_ALL(out, list, type, link, func, ...) \
   do {                                              \
     *(out) = true;                                  \
-    for (type* _slist_e = SLIST_FIRST(list);        \
+    for (type* _slist_e = _SLIST_FST(list);         \
          _slist_e != NULL;                          \
-         _slist_e = SLIST_NEXT(_slist_e, link)) {   \
+         _slist_e = _SLIST_NXT(_slist_e, link)) {   \
       if (!func(_slist_e, __VA_ARGS__)) {           \
         *(out) = false;                             \
         break;                                      \
@@ -361,9 +384,9 @@
 #define SLIST_ANY(out, list, type, link, func, ...) \
   do {                                              \
     *(out) = false;                                 \
-    for (type* _slist_e = SLIST_FIRST(list);        \
+    for (type* _slist_e = _SLIST_FST(list);         \
          _slist_e != NULL;                          \
-         _slist_e = SLIST_NEXT(_slist_e, link)) {   \
+         _slist_e = _SLIST_NXT(_slist_e, link)) {   \
       if (func(_slist_e, __VA_ARGS__)) {            \
         *(out) = true;                              \
         break;                                      \
@@ -382,13 +405,13 @@
 #define SLIST_MAX(out, list, type, link, func, ...) \
   do {                                              \
     type* _slist_e;                                 \
-    _slist_e = *(out) = SLIST_FIRST(list);          \
+    _slist_e = *(out) = _SLIST_FST(list);           \
     if (*(out) == NULL)                             \
       break;                                        \
     while (true) {                                  \
       if (func(*(out), _slist_e, __VA_ARGS__) < 1)  \
         *(out) = _slist_e;                          \
-      _slist_e = SLIST_NEXT(_slist_e, link);        \
+      _slist_e = _SLIST_NXT(_slist_e, link);        \
       if (_slist_e == NULL)                         \
         break;                                      \
     }                                               \
@@ -405,13 +428,13 @@
 #define SLIST_MIN(out, list, type, link, func, ...) \
   do {                                              \
     type* _slist_e;                                 \
-    _slist_e = *(out) = SLIST_FIRST(list);          \
+    _slist_e = *(out) = _SLIST_FST(list);           \
     if (*(out) == NULL)                             \
       break;                                        \
     while (true) {                                  \
       if (func(*(out), _slist_e, __VA_ARGS__) > -1) \
         *(out) = _slist_e;                          \
-      _slist_e = SLIST_NEXT(_slist_e, link);        \
+      _slist_e = _SLIST_NXT(_slist_e, link);        \
       if (_slist_e == NULL)                         \
         break;                                      \
     }                                               \
@@ -426,9 +449,9 @@
 #define SLIST_LENGTH(out, list, type, link)     \
   do {                                          \
     *(out) = 0;                                 \
-    for (type* _slist_e = SLIST_FIRST(list);    \
+    for (type* _slist_e = _SLIST_FST(list);     \
          _slist_e != NULL;                      \
-         _slist_e = SLIST_NEXT(_slist_e, link)) \
+         _slist_e = _SLIST_NXT(_slist_e, link)) \
       *(out) += 1;                              \
   } while (0)
 
@@ -441,14 +464,14 @@
 /// @param[in]  elem element to check
 #define SLIST_MEMBER(out, list, type, link, elem) \
   do {                                            \
-    type* _slist_e = SLIST_FIRST(list);           \
+    type* _slist_e = _SLIST_FST(list);            \
     *(out) = false;                               \
     while (_slist_e != NULL) {                    \
       if (_slist_e == elem) {                     \
         *(out) = true;                            \
         break;                                    \
       }                                           \
-      _slist_e = SLIST_NEXT(_slist_e, link);      \
+      _slist_e = _SLIST_NXT(_slist_e, link);      \
     }                                             \
   } while (0)
 
