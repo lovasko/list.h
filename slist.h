@@ -160,12 +160,15 @@
 /// @param[in] link element link name
 /// @param[in] func function
 /// @param[in] ...   variable-length arguments for the function
-#define SLIST_MAP(list, type, link, func, ...)  \
-  do {                                          \
-    for (type* _slist_e = _SLIST_FST(list);     \
-         _slist_e != NULL;                      \
-         _slist_e = _SLIST_NXT(_slist_e, link)) \
-      func(_slist_e, __VA_ARGS__);              \
+#define SLIST_MAP(list, type, link, func, ...) \
+  do {                                         \
+    type* _slist_e = _SLIST_FST(list);         \
+    intmax_t _slist_i = 0;                     \
+    while (_slist_e != NULL) {                 \
+      func(_slist_e, _slist_i, __VA_ARGS__);   \
+      _slist_e = _SLIST_NXT(_slist_e, link);   \
+      _slist_i++;                              \
+    }                                          \
   } while (0)
 
 /// Traverse the list and remove elements that fail for a predicate.
@@ -180,15 +183,17 @@
   do {                                                   \
     type** _slist_c = &(_SLIST_FST(list));               \
     type* _slist_e = NULL;                               \
+    intmax_t _slist_i = 0;                               \
     while (*_slist_c != NULL) {                          \
       _slist_e = *_slist_c;                              \
-      if (func(_slist_e, __VA_ARGS__)) {                 \
+      if (func(_slist_e, _slist_i, __VA_ARGS__)) {       \
         *_slist_c = _SLIST_NXT(_slist_e, link);          \
         if (clean != NULL)                               \
           clean(_slist_e);                               \
       } else {                                           \
         _slist_c = &(_SLIST_NXT(_slist_e, link));        \
       }                                                  \
+      _slist_i++;                                        \
     }                                                    \
   } while (0)
 
