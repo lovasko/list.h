@@ -39,6 +39,7 @@
 // SLIST_MIN     // O(n)            //
 // SLIST_LENGTH  // O(n)            //
 // SLIST_ZIP     // O(n)            //
+// SLIST_MEMBER  // O(n)            //
 //////////////////////////////////////
 
 /// Definition of a new element link.
@@ -434,6 +435,26 @@
          _slist_elem != NULL;                         \
          _slist_elem = SLIST_NEXT(_slist_elem, link)) \
       *(out) += 1;                                    \
+  } while (0)
+
+/// Check whether an element is a member of the list.
+///
+/// @param[out] out  decision
+/// @param[in]  list list
+/// @param[in]  type element C type name
+/// @param[in]  link element link name
+/// @param[in]  elem element to check
+#define SLIST_MEMBER(out, list, type, link, elem) \
+  do {                                            \
+    type* _slist_e = SLIST_FIRST(list);           \
+    *(out) = false;                               \
+    while (_slist_e != NULL) {                    \
+      if (_slist_e == elem) {                     \
+        *(out) = true;                            \
+        break;                                    \
+      }                                           \
+      _slist_e = SLIST_NEXT(_slist_e, link);      \
+    }                                             \
   } while (0)
 
 #endif
