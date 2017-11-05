@@ -4,17 +4,17 @@
 #include <errno.h>
 #include <inttypes.h>
 
-#include "../slist.h"
+#include "../list.h"
 
 
 /// Element.
 typedef struct _elem {
-  SLIST_LINK(_elem) el_next;
+  LIST_LINK(_elem) el_next;
   intmax_t          el_num;
 } elem;
 
 /// List.
-typedef SLIST_TYPE(_list, elem) list;
+typedef LIST_TYPE(_list, elem) list;
 
 /// Compare two elements by the numerical value they store.
 /// @return comparison result
@@ -76,7 +76,7 @@ main(int argc, char* argv[])
   int i;
 
   // Insert numbers from the command-line arguments to the list.
-  SLIST_NEW(&l);
+  LIST_NEW(&l);
   for (i = 1; i < argc; i++) {
     e = malloc(sizeof(*e));
 
@@ -85,16 +85,16 @@ main(int argc, char* argv[])
     e->el_num = strtoimax(argv[i], NULL, 10);
     if (e->el_num == 0 && errno != 0) {
       perror("strtoimax");
-      SLIST_FREE(&l, elem, el_next, free);
+      LIST_FREE(&l, elem, el_next, free);
 
       return EXIT_FAILURE;
     }
 
-    SLIST_PUSH(&l, e, el_next);
+    LIST_PUSH(&l, e, el_next);
   }
 
   // Verify that we have at least one element.
-  SLIST_EMPTY(&empty, &l);
+  LIST_EMPTY(&empty, &l);
   if (empty) {
     printf("No numbers provided.\n");
     return EXIT_FAILURE;
@@ -102,27 +102,27 @@ main(int argc, char* argv[])
 
   // Compute the sum of all numbers in the list.
   sum = 0;
-  SLIST_MAP(&l, elem, el_next, elem_sum, &sum);
+  LIST_MAP(&l, elem, el_next, elem_sum, &sum);
   printf("Sum of the numbers is %" PRIiMAX ".\n", sum);
 
   // Find the minimal number in the list.
-  SLIST_MIN(&min, &l, elem, el_next, elem_compare, &min);
+  LIST_MIN(&min, &l, elem, el_next, elem_compare, &min);
   printf("Minimum of the numbers is %" PRIiMAX ".\n", min->el_num);
 
   // Find the maximal number in the list.
-  SLIST_MAX(&max, &l, elem, el_next, elem_compare, &max);
+  LIST_MAX(&max, &l, elem, el_next, elem_compare, &max);
   printf("Maximum of the numbers is %" PRIiMAX ".\n", max->el_num);
 
   // Determine whether all numbers in the list are even.
-  SLIST_ALL(&all, &l, elem, el_next, elem_is_even, NULL);
+  LIST_ALL(&all, &l, elem, el_next, elem_is_even, NULL);
   printf("%s numbers are even.\n", all ? "All" : "Not all");
 
   // Determine whether there is at least one even number in the list.
-  SLIST_ANY(&any, &l, elem, el_next, elem_is_even, NULL);
+  LIST_ANY(&any, &l, elem, el_next, elem_is_even, NULL);
   printf("%s of the numbers are even.\n", any ? "Some" : "None");
 
   // Release all elements.
-  SLIST_FREE(&l, elem, el_next, free);
+  LIST_FREE(&l, elem, el_next, free);
 
   return EXIT_SUCCESS;
 }
