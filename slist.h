@@ -83,6 +83,26 @@
     *(out) = _slist_elem;                          \
   } while (0)
 
+/// Obtain the n-th element of the list.
+///
+/// @param[out] out  n-th element
+/// @param[in]  list list
+/// @param[in]  type element C type name
+/// @param[in]  link element link name
+/// @param[in]  n    position of the element
+#define SLIST_NTH(out, list, type, link, n)                  \
+  do {                                                       \
+    type* _slist_e = SLIST_FIRST(list);                      \
+    if (_slist_e == NULL) {                                  \
+      *(out) = NULL;                                         \
+      break;                                                 \
+    }                                                        \
+    for (intmax_t _slist_i = 0;                              \
+         _slist_i < (n) && _slist_e != NULL;                 \
+         _slist_i++, _slist_e = SLIST_NEXT(_slist_e, link)); \
+    *(out) = _slist_e;                                       \
+  } while (0)
+
 /// Obtain the linked element.
 /// @return NULL if no element is linked, next element otherwise
 ///
