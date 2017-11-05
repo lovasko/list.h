@@ -18,9 +18,9 @@ typedef SLIST_TYPE(_list, elem) list;
 
 /// Compare two elements by the numerical value they store.
 /// @return comparison result
-/// @retval  0 equal
-/// @retval  1 e1 is greater
-/// @retval -1 e2 is greater
+/// @retval  0 a and b equal
+/// @retval  1 a is greater
+/// @retval -1 b is greater
 ///
 /// @param[in] a first element
 /// @param[in] b second element
