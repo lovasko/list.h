@@ -45,9 +45,9 @@
 /// Definition of a new element link.
 ///
 /// @param[in] tag struct tag name
-#define SLIST_LINK(tag)      \
-  struct {                   \
-    struct tag* _slist_next; \
+#define SLIST_LINK(tag)     \
+  struct {                  \
+    struct tag* _slist_nxt; \
   }
 
 /// Definition of a new list type.
@@ -110,7 +110,7 @@
 /// @param[in] elem element
 /// @param[in] link element link name
 #define SLIST_NEXT(elem, link) \
-  ((elem)->link._slist_next)
+  ((elem)->link._slist_nxt)
 
 /// Initialise the list.
 ///
