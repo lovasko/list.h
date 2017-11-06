@@ -503,4 +503,26 @@
     }                                            \
   } while (0)
 
+/// Traverse two lists and execute a function involving both elements.
+///
+/// @param[in] list1 first list
+/// @param[in] type1 first element C type name
+/// @param[in] link1 first element link name
+/// @param[in] list2 second list
+/// @param[in] type2 second element C type name
+/// @param[in] link2 second element link name
+/// @param[in] func  function to execute
+/// @param[in] ...   variable-length arguments for the function
+#define LIST_ZIP(list1, type1, link1, list2, type2, link2, func, ...) \
+  do {                                                                \
+    type1* _list_a = _LIST_FST(list1);                                \
+    type2* _list_b = _LIST_FST(list2);                                \
+    intmax_t _list_i = 0;                                             \
+    while (_list_a != NULL && _list_b != NULL) {                      \
+      func(_list_a, _list_b, _list_i, __VA_ARGS__);                   \
+      _list_a = _LIST_NXT(_list_a, link1);                            \
+      _list_b = _LIST_NXT(_list_b, link2);                            \
+      _list_i++;                                                      \
+    }                                                                 \
+  } while (0)
 #endif
