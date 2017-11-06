@@ -27,7 +27,7 @@
 // LIST_REMOVE  // O(1)             //
 // LIST_FREE    // O(n)             //
 // LIST_SORT    // O(n * log n)     //
-// LIST_UNIQUE  // O(n)             //
+// LIST_UNIQUE  // O(n * n)         //
 // LIST_COPY    // O(1)             //
 // LIST_ATTACH  // O(1)             //
 // LIST_DETACH  // O(1)             //
@@ -301,6 +301,29 @@
   do {                                     \
     while (_LIST_FST(list) != NULL)        \
       LIST_POP(list, type, link, clean);   \
+  } while (0)
+
+/// Remove duplicate elements from the list.
+/// This function does not reorder the elements.
+///
+/// @param[in] list list
+/// @param[in] type element C type name
+/// @param[in] link element link name
+/// @param[in] clean deallocation function
+/// @param[in] func  comparator function
+/// @param[in] ...   variable-length arguments for the comparator function
+#define LIST_UNIQUE(list, type, link, clean, func, ...)                \
+  do {                                                                 \
+    type* _list_f = _LIST_FST(list);                                   \
+    while (_list_f != NULL) {                                          \
+      type* _list_g = _list_f;                                         \
+      while (_LIST_NXT(_list_g, link) != NULL) {                       \
+        if (func(_list_f, _LIST_NXT(_list_g, link), __VA_ARGS__) == 0) \
+          LIST_REMOVE(_list_g, type, link, clean);                     \
+        _list_g = _LIST_NXT(_list_g, link);                            \
+      }                                                                \
+      _list_f = _LIST_NXT(_list_f, link);                              \
+    }                                                                  \
   } while (0)
 
 /// Attach a new chain of elements to the list instead of the current one.
