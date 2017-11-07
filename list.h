@@ -40,6 +40,7 @@
 // LIST_LENGTH  // O(n)             //
 // LIST_ZIP     // O(n)             //
 // LIST_MEMBER  // O(n)             //
+// LIST_APPEND  // O(n)             //
 //////////////////////////////////////
 
 /// Definition of a new element link.
@@ -524,5 +525,23 @@
       _list_b = _LIST_NXT(_list_b, link2);                            \
       _list_i++;                                                      \
     }                                                                 \
+  } while (0)
+
+/// Append elements from one list to the end of another one.
+///
+/// @param[in] list1 first list
+/// @param[in] list2 second list
+/// @param[in] type  element C type name
+/// @param[in] link  element link name
+#define LIST_APPEND(list1, list2, type, link) \
+  do {                                        \
+    type* _list_f;                            \
+    type* _list_g = _LIST_FST(list2);         \
+    _LIST_FST(list2) = NULL;                  \
+    LIST_LAST(&_list_f, list1, type, link);   \
+    if (_list_f == NULL)                      \
+      _LIST_FST(list1) = _list_g;             \
+    else                                      \
+      _LIST_NXT(_list_f, link) = _list_g;     \
   } while (0)
 #endif
