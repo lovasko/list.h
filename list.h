@@ -304,6 +304,68 @@
       LIST_POP(list, type, link, clean);   \
   } while (0)
 
+/// Sort the elements in the list.
+///
+/// The sorting algorithm used is the bottom-up merge-sort which is not
+/// recursive. The running time of the algorithm is O(n * log n) and uses
+/// O(1) space. The sorting algorithm is stable.
+///
+/// @param[in] list list
+/// @param[in] type element C type name
+/// @param[in] link element link name
+/// @param[in] func comparator function
+/// @param[in] ...  variable-length arguments for the comparator function
+#define LIST_SORT(list, type, link, func, ...)                      \
+  do {                                                              \
+    intmax_t _list_gl, _list_nm, _list_ls, _list_rs;                \
+    type *_list_l, *_list_r, *_list_t, *_list_n, *_list_x;          \
+    _list_x = _LIST_FST(list);                                      \
+    if (_list_x == NULL || _LIST_NXT(_list_x, link) == NULL)        \
+      break;                                                        \
+    _list_gl = 1;                                                   \
+    do {                                                            \
+      _list_nm = 0;                                                 \
+      _list_l = _list_x;                                            \
+      _list_t = NULL;                                               \
+      _list_x = NULL;                                               \
+      while (_list_l != NULL) {                                     \
+        _list_nm += 1;                                              \
+        _list_r = _list_l;                                          \
+        _list_ls = 0;                                               \
+        _list_rs = _list_gl;                                        \
+        while ((_list_r != NULL) && (_list_ls < _list_gl)) {        \
+          _list_ls += 1;                                            \
+          _list_r = _LIST_NXT(_list_r, link);                       \
+        }                                                           \
+        while (_list_ls > 0 || (_list_rs > 0 && _list_r != NULL)) { \
+          if (_list_ls == 0) {                                      \
+            _list_n = _list_r;                                      \
+            _list_r = _LIST_NXT(_list_r, link);                     \
+            _list_rs -= 1;                                          \
+          } else if (_list_rs == 0 || _list_r == NULL ||            \
+              func(_list_l, _list_r, __VA_ARGS__) < 0) {            \
+            _list_n = _list_l;                                      \
+            _list_l = _LIST_NXT(_list_l, link);                     \
+            _list_ls -= 1;                                          \
+          } else {                                                  \
+            _list_n = _list_r;                                      \
+            _list_r = _LIST_NXT(_list_r, link);                     \
+            _list_rs -= 1;                                          \
+          }                                                         \
+          if (_list_t != NULL)                                      \
+            _LIST_NXT(_list_t, link) = _list_n;                     \
+          else                                                      \
+            _list_x = _list_n;                                      \
+          _list_t = _list_n;                                        \
+        }                                                           \
+        _list_l = _list_r;                                          \
+      }                                                             \
+      _LIST_NXT(_list_t, link) = NULL;                              \
+      _list_gl *= 2;                                                \
+    } while (_list_nm > 1);                                         \
+    _LIST_FST(list) = _list_x;                                      \
+  } while (0)
+
 /// Remove duplicate elements from the list.
 /// This function does not reorder the elements.
 ///
