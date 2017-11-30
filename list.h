@@ -16,7 +16,6 @@
 // LIST_NEXT    // O(1)             //
 // LIST_NEW     // O(1)             //
 // LIST_EMPTY   // O(1)             //
-// LIST_LENGTH  // O(n)             //
 // LIST_MAP     // O(n)             //
 // LIST_FILTER  // O(n)             //
 // LIST_REVERSE // O(n)             //
