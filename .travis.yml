@@ -1,0 +1,6 @@
+language: c
+compiler:
+ - clang
+ - gcc
+sudo: required
+script: (cd test; ./test.sh)
